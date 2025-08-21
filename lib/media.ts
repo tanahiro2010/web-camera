@@ -8,6 +8,12 @@ type MediaFileInsert = Database['public']['Tables']['media_files']['Insert']
 
 export const uploadFile = async (file: File, userId: string): Promise<MediaFile | null> => {
   try {
+    console.log('Uploading file with userId:', userId)
+    
+    // 認証状態を確認
+    const { data: { session } } = await supabase.auth.getSession()
+    console.log('Current session:', session)
+    
     const fileExt = file.name.split('.').pop()
     const fileName = `${Math.random()}.${fileExt}`
     const filePath = `${userId}/${fileName}`

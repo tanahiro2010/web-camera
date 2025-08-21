@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Camera, Square, Circle, RotateCcw, Upload } from 'lucide-react'
@@ -29,18 +29,23 @@ export default function CameraComponent({ onCapture }: CameraProps) {
         audio: true
       })
       setStream(mediaStream)
-      if (videoRef.current) {
-        console.log(mediaStream);
-        videoRef.current.srcObject = mediaStream
-        videoRef.current.play() // 追加
-      }
     } catch (error) {
       console.error('Error accessing camera:', error)
       toast.error('カメラへのアクセスに失敗しました')
     }
   }, [facingMode])
 
+  // streamがセットされたらvideoRefに割り当て
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      console.log('Setting stream to video element')
+      videoRef.current.srcObject = stream
+      videoRef.current.play()
+    }
+  }, [stream])
+
   const stopCamera = useCallback(() => {
+    console.log('Stopping camera')
     if (stream) {
       stream.getTracks().forEach(track => track.stop())
       setStream(null)

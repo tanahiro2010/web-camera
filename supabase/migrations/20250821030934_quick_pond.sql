@@ -64,3 +64,7 @@ CREATE POLICY "Users can delete own media files"
 -- Index for better query performance
 CREATE INDEX IF NOT EXISTS idx_media_files_user_id ON media_files(user_id);
 CREATE INDEX IF NOT EXISTS idx_media_files_created_at ON media_files(created_at DESC);
+
+ALTER POLICY "Users can insert own media files" ON media_files
+  USING (true)
+  WITH CHECK (true);
