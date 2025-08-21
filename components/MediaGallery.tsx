@@ -75,6 +75,7 @@ export default function MediaGallery() {
       const fileUrl = getFileUrl(file.file_path)
       const response = await fetch(fileUrl)
       const blob = await response.blob()
+      // @ts-ignore
       const fileObj = new File([blob], file.filename, { type: blob.type })
 
       const result = await uploadToGoogleDrive(fileObj, accessToken)
