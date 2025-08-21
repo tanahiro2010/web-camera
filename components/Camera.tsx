@@ -19,7 +19,7 @@ export default function CameraComponent({ onCapture }: CameraProps) {
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [isRecording, setIsRecording] = useState(false)
   const [capturedMedia, setCapturedMedia] = useState<{ blob: Blob, type: 'image' | 'video' } | null>(null)
-  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment')
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [uploading, setUploading] = useState(false)
 
   const startCamera = useCallback(async () => {
@@ -30,6 +30,7 @@ export default function CameraComponent({ onCapture }: CameraProps) {
       })
       setStream(mediaStream)
       if (videoRef.current) {
+        console.log(mediaStream);
         videoRef.current.srcObject = mediaStream
         videoRef.current.play() // 追加
       }
@@ -124,7 +125,8 @@ export default function CameraComponent({ onCapture }: CameraProps) {
       }
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error('アップロードに失敗しました')
+      /** @ts-ignore */
+      toast.error(`アップロードに失敗しました: ${error.message}`)
     } finally {
       setUploading(false)
     }
