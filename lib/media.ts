@@ -10,43 +10,27 @@ export const uploadFile = async (file: File, userId: string): Promise<MediaFile 
   try {
     console.log('Uploading file with userId:', userId)
     
-    // 認証状態を確認
-    const { data: { session } } = await supabase.auth.getSession()
-    console.log('Current session:', session)
+    // FormDataを作成してAPI Routeに送信
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('userId', userId)
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    })
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`)
+    }
+
+    const result = await response.json()
     
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${Math.random()}.${fileExt}`
-    const filePath = `${userId}/${fileName}`
-
-    // Upload file to storage
-    const { error: uploadError } = await supabase.storage
-      .from('media')
-      .upload(filePath, file)
-
-    if (uploadError) {
-      throw uploadError
+    if (result.error) {
+      throw new Error(result.error)
     }
 
-    // Save metadata to database
-    const mediaFile: MediaFileInsert = {
-      user_id: userId,
-      filename: file.name,
-      file_path: filePath,
-      file_type: file.type.startsWith('image/') ? 'image' : 'video',
-      size: file.size
-    }
-
-    const { data, error } = await supabase
-      .from('media_files')
-      .insert(mediaFile)
-      .select()
-      .single()
-
-    if (error) {
-      throw error
-    }
-
-    return data
+    return result.data
   } catch (error) {
     console.error('Error uploading file:', error)
     return null
