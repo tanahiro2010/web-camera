@@ -31,6 +31,7 @@ export default function CameraComponent({ onCapture }: CameraProps) {
       setStream(mediaStream)
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream
+        videoRef.current.play() // 追加
       }
     } catch (error) {
       console.error('Error accessing camera:', error)
